@@ -1,14 +1,23 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12.0-slim
- 
-# Install git (needed if you are pulling packages from git repositories)
-RUN apt-get update && apt-get install -y git
+FROM python:3.12.0
+
+# Install git and other dependencies
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+# Create a new user
+RUN useradd -m jupyteruser
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /home/jupyteruser/app
 
-# Copy the current directory contents into the container at /usr/src/app
+# Copy the current directory contents into the container at /home/jupyteruser/app
 COPY . .
+
+# Change ownership of the working directory
+RUN chown -R jupyteruser:jupyteruser /home/jupyteruser/app
+
+# Switch to the new user
+USER jupyteruser
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
@@ -17,4 +26,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8888
 
 # Run Jupyter Notebook
-CMD ["jupyter", "notebook", "--config=/root/.jupyter/jupyter_server_config.py"]
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
