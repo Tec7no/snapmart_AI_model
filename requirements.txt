@@ -1,0 +1,7 @@
+numpy
+pandas
+matplotlib
+plotly
+tensorflow
+jupyter
+git+https://github.com/chsasank/image_features.git
